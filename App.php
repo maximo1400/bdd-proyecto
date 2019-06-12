@@ -1,15 +1,17 @@
 <?php
 $host = 'cc3201.dcc.uchile.cl';
-$db   = 'test';
-$user = 'root';
-$pass = '';
+$db   = 'cc3201';
+$user = 'cc3201';
+$port = 5412;
+$pass = 'Zac8bot';
 $charset = 'utf8mb4';
 
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$dsn = "pgsql:host=$host;dbname=$db;charset=$charset";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES   => false,
+    PDO::PGSQL_DIAG_SQLSTATE
 ];
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
@@ -17,14 +19,6 @@ try {
     throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
 
-
-HOST = "cc3201.dcc.uchile.cl";
-PORT = "5412";
-DATABASE = "cc3201";
-CONNECTION_URL = "jdbc:postgresql://"+HOST+":"+PORT+"/"+DATABASE;
-USERNAME = "cc3201";
-PASSWORD = "Zac8bot";
-SSL = "true";
 
 //try {
 //    $pdo = new PDO('pgsql:host=cc3201.dcc.uchile.cl;port=5412;dbname=cc3201;user=cc3201;password=Zac8bot');
