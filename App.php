@@ -18,7 +18,13 @@ try {
 }
 
 
-
+HOST = "cc3201.dcc.uchile.cl";
+PORT = "5412";
+DATABASE = "cc3201";
+CONNECTION_URL = "jdbc:postgresql://"+HOST+":"+PORT+"/"+DATABASE;
+USERNAME = "cc3201";
+PASSWORD = "Zac8bot";
+SSL = "true";
 
 //try {
 //    $pdo = new PDO('pgsql:host=cc3201.dcc.uchile.cl;port=5412;dbname=cc3201;user=cc3201;password=Zac8bot');
