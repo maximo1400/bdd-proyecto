@@ -31,11 +31,13 @@ for ($counter = 0; $counter < $total_column; $counter ++) {
     $column[] = $meta['name'];
 }
 print_r($column);
+
+
 while ($row = $stmt->fetchAll(PDO::FETCH_NUM)){
-    print_r("<p>");
+    //print_r("<p>");
     for ($i = 0; $i <2; $i++){
         //$row->getAttribute($i);
-        var_dump($row[$i]);
+        print("<pre>".print_r($row[$i],true)."</pre>");
     }
 }
 
