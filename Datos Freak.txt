@@ -1,0 +1,123 @@
+
+DIFERENCIA DE GOLES POR CADA PARTIDO
+SELECT *, ABS(hometeamgoals-awayteamgoals) AS dif FROM WorldCupMatches ORDER BY dif DESC;
+
+
+PARTIDOS EMPATADOS
+SELECT * SELECT WorldCupMatches WHERE hometeamgoals-awayteamgoals = 0 ORDER BY year DESC;
+
+
+PARTIDOS QUE TERMINARON EN EL TIEMPO EXTRA
+SELECT * FROM WorldCupMatches WHERE winconditions ILIKE '%extra time%' ORDER BY year DESC;
+
+
+PARTIDOS QUE SE FUERON A PENALES
+SELECT * FROM WorldCupMatches WHERE winconditions ILIKE '%penalties%' ORDER BY year DESC;
+
+
+CANTIDAD DE MUNDIALES POR JUGADOR
+SELECT x.playername, x.teaminitials, COUNT(DISTINCT x.year) AS cantidad FROM(
+worldcupplayers
+JOIN 
+worldcupmatches 
+USING (matchid)
+)x
+GROUP BY x.playername, x.teaminitials
+ORDER BY cantidad DESC;
+
+
+CANTIDAD DE MUNDIALES QUE HA GANADO UN PAIS QUE HA SALIDO CAMPEON
+SELECT winner, COUNT(winner) FROM worldcups GROUP BY winner ORDER BY COUNT DESC;
+
+
+CANTIDAD DE PARTIDOS POR ARBITRO
+SELECT referee, COUNT(referee) AS ref FROM worldcupmatches GROUP BY referee ORDER BY COUNT DESC;
+
+
+CANTIDAD DE PARTIDOS POR DIRECTOR TECNICO
+SELECT coachname, COUNT(DISTINCT matchid) FROM worldcupplayers GROUP BY coachname ORDER BY COUNT DESC;
+
+
+CANTIDAD DE PARTIDOS EN EL CUAL UN JUGADOR USA LA CAMISETA CON NUMERO 10
+SELECT COUNT(DISTINCT matchid), playername FROM worldcupplayers WHERE shirtnumber = 10 GROUP BY playername ORDER BY COUNT DESC;
+
+
+CANTIDAD DE VECES QUE UN JUGADOR HA JUGADO COMO ARQUERO
+SELECT COUNT(DISTINCT matchid), playername, teaminitials FROM worldcupplayers WHERE POSITION  = 'GK' GROUP BY playername, teaminitials ORDER BY COUNT DESC;
+
+
+CANTIDAD DE VECES QUE UN JUGADOR HA JUGADO COMO CAPITAN
+SELECT COUNT(DISTINCT matchid), playername, teaminitials FROM worldcupplayers WHERE POSITION  = 'C' GROUP BY playername, teaminitials ORDER BY COUNT DESC;
+
+
+CANTIDAD DE JUGADORES EN POR EQUIPO EN CADA MUNDIAL
+SELECT m.year, p.teaminitials, COUNT(DISTINCT p.playername)
+FROM worldcupplayers p,worldcupmatches m
+WHERE p.matchid = m.matchid
+GROUP BY m.year,p.teaminitials;
+
+
+JUGADORES DE LA SELECCION CHILENA EN EL MUNDIAL DEL 2014
+select distinct p.playername
+from worldcupplayers p, worldcupmatches m
+where p.matchid = m.matchid
+and m.year = 2014
+and p.teaminitials = 'CHI';
+
+
+JUGADORES DE LA SELECCION CHILENA EN EL MUNDIAL DEL 2014
+SELECT DISTINCT x.playername
+FROM(
+	worldcupplayers
+	JOIN 
+	worldcupmatches
+	USING(matchid)
+)x
+WHERE year = 2014
+AND teaminitials = 'CHI'
+;
+
+
+RAZON ENTRE CANTIDAD DE PERSONA Y CANTIDAD DE PARTIDOS POR CADA MUNDIAL
+SELECT year, country, (attendance/matchesplayed) AS ratio FROM worldcups ORDER BY ratio DESC;
+
+
+LA CANTIDAD DE PERSONAS QUE ATENDIERON A CADA PARTIDO
+SELECT year, hometeamname, awayteamname, stadium, attendance FROM worldcupmatches ORDER BY attendance DESC;
+
+
+
+
+
+
+
+
+
+
+select coachname from(
+select distinct coachname from worldcupplayers
+join
+(select distinct playername from worldcupplayers)as a
+where coachname ilike a.playername
+)x;
+
+select count(*) from(
+select distinct awayteamname from worldcupmatches                                                                                                                                                  union                                                                                                                                                                                                       select distinct hometeamname from worldcupmatches
+)x;
+
+select distinct awayteamname from worldcupmatches                                                                                                                                                  union                                                                                                                                                                                                       select distinct hometeamname from worldcupmatches
+order by awayteamname;
+
+
+
+
+BEGIN
+IF (hometeamgoals-awayteamgoals) > 0
+THEN 
+SELECT MATCHID, hometeamname as winner, awayteamname FROM WorldCupMatches;
+If (hometeamgoals-awayteamgoals) < 0
+THEN
+SELECT MATCHID, hometeamname, awayteamname as winner FROM WorldCupMatches;
+ELSE SELECT MATCHID, hometeamname, awayteamname, 'EMPATE' FROM WORLDCUPMATCHES;
+END IF;
+END
