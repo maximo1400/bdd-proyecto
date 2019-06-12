@@ -21,15 +21,24 @@ try {
 } catch (PDOException $e) {
     throw new PDOException($e->getMessage(), (int)$e->getCode());
 }
-$stmt =$pdo->query("SELECT * FROM g12.worldcups;");
+$stmt =$pdo->prepare("SELECT * FROM g12.worldcups;");
+$stmt->execute();
+$total_column = $stmt->columnCount();
+var_dump($total_column);
 
-while ($row = $stmt->fetch(PDO::FETCH_NUM )){
-    print_r("<br>");
-    for ($i = 0; $i <=4; $i++){
-        print_r($row[$i]);
+for ($counter = 0; $counter < $total_column; $counter ++) {
+    $meta = $stmt->getColumnMeta($counter);
+    $column[] = $meta['name'];
+}
+print_r($column);
+while ($row = $stmt->fetchAll(PDO::FETCH_NUM)){
+    print_r("<p>");
+    for ($i = 0; $i <2; $i++){
+        //$row->getAttribute($i);
+        var_dump($row[$i]);
     }
 }
-    print_r("<p>".$row[3]);
+
 
 //try {
 //    $pdo = new PDO('pgsql:host=cc3201.dcc.uchile.cl;port=5412;dbname=cc3201;user=cc3201;password=Zac8bot');
