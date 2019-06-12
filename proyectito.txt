@@ -1,0 +1,147 @@
+﻿CREATE TABLE WorldCupMatches (
+Year SMALLINT,
+Datetime VARCHAR (255),
+Stage VARCHAR (255),
+Stadium VARCHAR (255),
+City VARCHAR (255),
+HomeTeamName VARCHAR (255),
+HomeTeamGoals SMALLINT,
+AwayTeamGoals SMALLINT,
+AwayTeamName VARCHAR (255),
+WinConditions VARCHAR(255),
+Attendance INTEGER,
+HalfTimeHomeGoals SMALLINT,
+HalfTimeAwayGoals SMALLINT,
+Referee VARCHAR(255),
+Assistant1 VARCHAR (255),
+Assistant2 VARCHAR (255),
+RoundID INTEGER,
+MatchID INTEGER PRIMARY KEY,
+HomeTeamInitials VARCHAR (4),
+AwayTeamInitials VARCHAR (4)
+);
+
+COPY WorldCupMatches FROM '/home/cc3201/WorldCupMatchess2.csv' DELIMITER ',';
+
+CREATE INDEX MatchID_i ON WorldCupMatches USING hash(MatchID);
+CREATE INDEX anho ON WorldCupMatches(year);
+
+
+
+CREATE TABLE WorldCups (
+Year INTEGER PRIMARY KEY,
+Country VARCHAR (20),
+Winner VARCHAR (20),
+Runners_Up VARCHAR (20),
+Third VARCHAR (20),
+Fourth VARCHAR (20),
+GoalsScored INTEGER,
+QualifiedTeams INTEGER,
+MatchesPlayed INTEGER,
+Attendance INTEGER
+);
+
+COPY WorldCups FROM '/home/cc3201/WorldCupss.csv' DELIMITER ',';
+
+CREATE INDEX worldcup_anho ON WorldCups(year);	
+
+
+
+
+CREATE TABLE WorldCupPlayers (
+RoundID INTEGER,
+MatchID INTEGER REFERENCES WorldCupMatches(MatchID),
+TeamInitials VARCHAR (4),
+CoachName VARCHAR (50),
+LineUp VARCHAR (2),
+ShirtNumber SMALLINT,
+PlayerName VARCHAR (50),
+Position VARCHAR (5),
+PRIMARY KEY(MatchID,TeamInitials,ShirtNumber,PlayerName)
+);
+
+
+COPY WorldCupPlayers FROM '/home/cc3201/WorldCupPlayerss.csv' DELIMITER ',';
+
+CREATE INDEX MatchID_player_i ON WorldCupPlayers USING hash(MatchID);
+CREATE INDEX RoundID_i ON WorldCupPlayers USING hash(RoundID);
+CREATE INDEX TI_i ON WorldCupPlayers USING hash(TeamInitials);
+CREATE INDEX SN_i ON WorldCupPlayers USING hash(ShirtNumber);
+CREATE INDEX PN_i ON WorldCupPlayers USING hash(PlayerName);
+CREATE INDEX Coach_i ON WorldCupPlayers USING hash(CoachName);
+CREATE INDEX LineUp_i ON WorldCupPlayers USING hash(LineUp);
+
+
+
+###Vistas###
+
+CREATE VIEW PartidosPorJugador AS
+SELECT PlayerName, COUNT(MatchID) AS Played_Matches
+FROM WorldCupPlayers
+GROUP BY PlayerName;
+
+
+CREATE MATERIALIZED VIEW MundialesPorJugador AS
+SELECT PlayerName, COUNT(DISTINCT WCM.Year) AS Mundiales_Jugados
+FROM WorldCupPlayers WCP, WorldCupMatches WCM
+WHERE WCP.MatchID = WCM.MatchID
+GROUP BY PlayerName, TeamInitials
+ORDER BY Mundiales_Jugados DESC;
+
+
+CREATE VIEW MatchResults AS
+SELECT DateTime, HomeTeamName, AwayTeamName, HomeTeamGoals, AwayTeamGoals
+FROM WorldCupMatches;
+
+
+CREATE MATERIALIZED VIEW Paises AS
+SELECT HomeTeamName AS Pais FROM WorldCupMatches 
+UNION 
+SELECT AwayTeamName FROM WorldCupMatches;
+
+
+
+CREATE MATERIALIZED VIEW EstadisticasPaises AS
+SELECT * FROM
+(SELECT Pais, COUNT(WC.Winner) AS N_PrimerLugar
+FROM Paises, WorldCups WC
+WHERE Pais = WC.Winner
+GROUP BY Pais)A1
+FULL OUTER JOIN
+(SELECT Pais, COUNT(WC.Runners_Up) AS N_SegundoLugar
+FROM Paises, WorldCups WC
+WHERE Pais = WC.Runners_Up
+GROUP BY Pais)A2
+USING (Pais)
+FULL OUTER JOIN
+(SELECT Pais, COUNT(WC.Third) AS N_TercerLugar
+FROM Paises, WorldCups WC
+WHERE Pais = WC.Third
+GROUP BY Pais)A3
+USING (Pais)
+FULL OUTER JOIN
+(SELECT Pais, COUNT(WC.Fourth) AS N_CuartoLugar
+FROM Paises, WorldCups WC
+WHERE Pais = WC.Fourth
+GROUP BY Pais)A4
+USING (Pais);
+
+
+
+###Consultas###
+
+Ingrese año del mundial para ver sus partidos:
+SELECT * FROM WorldCupMatches WHERE year = ?;
+
+Nombre de jugador para ver partidos jugados en mundiales:
+SELECT * FROM PartidosPorJugador WHERE PlayerName = ?;
+
+Nombre de jugador para ver mundiales en los que ha participado:
+SELECT * FROM PartidosPorJugador WHERE PlayerName = ?;
+
+Nombre de país para conocer los partidos que ha jugado:
+SELECT * FROM MatchResults WHERE HomeTeamName ILIKE '%?%' OR AwayTeamName ILIKE '%?%';
+
+Nombre de la selección para conocer sus estadísticas en los mundiales:
+SELECT * FROM EstadisticasPaises WHERE pais = ?;
+
