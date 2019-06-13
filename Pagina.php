@@ -22,11 +22,14 @@
         background-color: #dddddd;
     }
 </style>
+
 <?php
-$host = 'localhost';
+$year= $_POST["year"];
+$country =$_POST["country"];
+$host = 'cc3201.dcc.uchile.cl';
 $db   = 'cc3201';
 $user = 'webuser';
-$port = '5432';
+$port = '5412';
 $pass = 'Bot9zac';
 $charset = 'utf-8';
 
@@ -44,15 +47,18 @@ try {
 } catch (\PDOException $e) {
     throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
-$stmt =$pdo->prepare("SELECT * FROM g12.worldcupplayers;");
-$stmt->execute();
+//$stmt =$pdo->prepare("SELECT * FROM g12.worldcupplayers where country = ? AND year = ? LIMIT 1;");
+//$stmt->execute([$_POST["country"],$_POST["year"]]);
+$stmt =$pdo->prepare("SELECT year,hometeamname,awayteamgoals
+                    FROM g12.paises WHERE country = :country LIMIT 1;");
+$stmt->execute(["country" =>$country]);
 $total_column = $stmt->columnCount();
 
 for ($j = 0; $j < $total_column; $j ++) {
     $meta = $stmt->getColumnMeta($j);
     $labels[] = $meta['name'];
 }
-
+echo "<h2>World Cup Players</h2>";
 echo '<table>';
 echo "<tr>";
 foreach ($labels as $key)

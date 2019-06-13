@@ -1,9 +1,9 @@
 <?php
 $host = 'cc3201.dcc.uchile.cl';
 $db   = 'cc3201';
-$user = 'webuser';
+$user = 'cc3201';
 $port = '5412';
-$pass = 'Bot9zac';
+$pass = 'Zac8bot';
 $charset = 'utf-8';
 
 $dsn = "pgsql:host=$host;port=$port;dbname=$db;user=$user;password=$pass";
@@ -20,7 +20,7 @@ try {
 } catch (\PDOException $e) {
     throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
-$stmt =$pdo->prepare("SELECT * FROM g12.worldcups LIMIT 4;");
+$stmt =$pdo->prepare("SELECT * FROM g12.worldcups Limit 3;");
 $stmt->execute();
 $total_column = $stmt->columnCount();
 
