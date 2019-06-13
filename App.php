@@ -9,7 +9,7 @@ $charset = 'utf-8';
 $dsn = "pgsql:host=$host;port=$port;dbname=$db;user=$user;password=$pass";
 $options = [
     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_LAZY,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     PDO::ATTR_EMULATE_PREPARES   => false,
 ];
 try {
@@ -43,13 +43,6 @@ while ($row = $stmt->fetch()) {
         }
     }
     echo "</tr>";
-echo "<table>";
-
-
-
-
-
-
-
+echo "</table>";
 
 ?>
