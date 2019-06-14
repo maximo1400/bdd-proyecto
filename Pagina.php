@@ -24,8 +24,7 @@
 </style>
 
 <?php
-$year= $_POST["year"];
-$country =$_POST["country"];
+
 $host = 'cc3201.dcc.uchile.cl';
 $db   = 'cc3201';
 $user = 'webuser';
@@ -47,11 +46,10 @@ try {
 } catch (\PDOException $e) {
     throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
-//$stmt =$pdo->prepare("SELECT * FROM g12.worldcupplayers where country = ? AND year = ? LIMIT 1;");
-//$stmt->execute([$_POST["country"],$_POST["year"]]);
-$stmt =$pdo->prepare("SELECT year,hometeamname,awayteamgoals
-                    FROM g12.paises WHERE country = :country LIMIT 1;");
-$stmt->execute(["country" =>$country]);
+$stmt =$pdo->prepare("SELECT * FROM g12.worldcups Limit 1;");
+$stmt->execute();
+//$stmt =$pdo->prepare("SELECT year,hometeamname,awayteamname FROM g12.worldcupmatches WHERE country = :country AND year = :year LIMIT 1;");
+//$stmt->execute(["country" =>$country,"year"=>$year]);
 $total_column = $stmt->columnCount();
 
 for ($j = 0; $j < $total_column; $j ++) {

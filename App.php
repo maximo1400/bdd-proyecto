@@ -20,7 +20,7 @@ try {
 } catch (\PDOException $e) {
     throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
-$stmt =$pdo->prepare("SELECT * FROM g12.worldcups Limit 3;");
+$stmt =$pdo->prepare("SELECT * FROM g12.worldcups Limit 3");
 $stmt->execute();
 $total_column = $stmt->columnCount();
 
