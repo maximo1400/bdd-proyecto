@@ -39,7 +39,7 @@ while ($row = $stmt->fetch()) {
     echo "<tr>";
         for($i=0;$i<$total_column;$i++){
             $valor=$row[$i];
-            echo "<td>".$valor."</td>";
+            echo "<td>".$valor;
         }
     }
     echo "</tr>";

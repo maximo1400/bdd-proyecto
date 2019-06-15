@@ -17,7 +17,9 @@ function printTable( Object $stmt){
         $ret.= "<tr>";
         for($i=0;$i<$total_column;$i++){
             $valor=$row[$i];
-            $ret.= "<td>".$valor."</td>";
+           $ret.= "<td>";
+            $ret.=$valor;
+            //$ret.="</td>";
         }
     }
     $ret.= "</tr>";
