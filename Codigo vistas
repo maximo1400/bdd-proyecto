@@ -1,0 +1,79 @@
+Vistas:
+
+MatchResults (Virtual):
+
+SELECT WorldCupMatches.year,
+    WorldCupMatches.hometeamname,
+    WorldCupMatches.awayteamname,
+    WorldCupMatches.hometeamgoals,
+    WorldCupMatches.awayteamgoals
+FROM WorldCupMatches;
+
+PaisesConIniciales (Virtual):
+
+SELECT DISTINCT WorldCupMatches.hometeamname,
+WorldCupMatches.hometeaminitials
+FROM WorldCupMatches
+UNION
+SELECT DISTINCT WorldCupMatches.awayteamname AS hometeamname,
+WorldCupMatches.awayteaminitials AS hometeaminitials
+FROM WorldCupMatches;
+
+PartidosPorJugador (Virtual):
+
+SELECT WorldCupPlayers.playername,
+    COUNT(WorldCupPlayers.matchid) AS played_matches
+FROM WorldCupPlayers
+GROUP BY WorldCupPlayers.playername;
+
+EstadisticasPaises (Materializada):
+
+SELECT pais,
+    a1.n_primerlugar,
+    a2.n_segundolugar,
+    a3.n_tercerlugar,
+    a4.n_cuartolugar
+FROM ( SELECT paises.pais,
+            count(wc.winner) AS n_primerlugar
+           FROM paises,
+            worldcups wc
+          WHERE paises.pais::text = wc.winner::text
+          GROUP BY paises.pais) a1
+     FULL JOIN ( SELECT paises.pais,
+            count(wc.runners_up) AS n_segundolugar
+           FROM paises,
+            worldcups wc
+          WHERE paises.pais::text = wc.runners_up::text
+          GROUP BY paises.pais) a2 USING (pais)
+     FULL JOIN ( SELECT paises.pais,
+            count(wc.third) AS n_tercerlugar
+           FROM paises,
+            worldcups wc
+          WHERE paises.pais::text = wc.third::text
+          GROUP BY paises.pais) a3 USING (pais)
+     FULL JOIN ( SELECT paises.pais,
+            count(wc.fourth) AS n_cuartolugar
+           FROM paises,
+            worldcups wc
+          WHERE paises.pais::text = wc.fourth::text
+          GROUP BY paises.pais) a4 USING (pais);
+
+
+MundialesPorJugador (Materializada):
+
+SELECT wcp.playername,
+    count(DISTINCT wcm.year) AS mundiales_jugados
+FROM worldcupplayers wcp,
+    worldcupmatches wcm
+WHERE wcp.matchid = wcm.matchid
+GROUP BY wcp.playername, wcp.teaminitials
+ORDER BY (count(DISTINCT wcm.year)) DESC;
+
+Paises (Materializada):
+
+SELECT worldcupmatches.hometeamname AS pais
+FROM worldcupmatches
+UNION
+SELECT worldcupmatches.awayteamname AS pais
+FROM worldcupmatches;
+
